@@ -6,5 +6,5 @@ build/
 *.log
 coverage/
 .DS_Store
-contexto/
+context/
 .idea/
