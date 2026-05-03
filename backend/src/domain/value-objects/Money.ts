@@ -1,5 +1,3 @@
-// Value object — garante que valores monetários sejam positivos.
-
 export class Money {
     private constructor(private readonly valor: number) {
     }

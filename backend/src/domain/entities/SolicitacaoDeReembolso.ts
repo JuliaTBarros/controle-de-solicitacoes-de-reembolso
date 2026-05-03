@@ -1,5 +1,5 @@
-import { ReembolsoStatus } from '../value-objects/ReembolsoStatus';
-import { Money } from '../value-objects/Money';
+import {ReembolsoStatus} from '../value-objects/ReembolsoStatus';
+import {Money} from '../value-objects/Money';
 
 export interface ReembolsoProps {
     id: number;

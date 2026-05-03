@@ -1,5 +1,3 @@
-// Entidade de domínio — categoria de despesa.
-
 export interface CategoryProps {
     id: number;
     nome: string;

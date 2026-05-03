@@ -1,5 +1,3 @@
-// Entidade de domínio — usuário com seu perfil.
-
 export enum Role {
     COLABORADOR = 'COLABORADOR',
     GESTOR = 'GESTOR',
