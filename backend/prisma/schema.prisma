@@ -7,68 +7,68 @@ datasource db {
 }
 
 // Role values: COLABORADOR | GESTOR | FINANCEIRO | ADMIN
-model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  role      String   @default("COLABORADOR")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Usuario {
+  id           Int      @id @default(autoincrement())
+  nome         String
+  email        String   @unique
+  senha        String
+  perfil       String   @default("COLABORADOR")
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
 
-  reimbursements Reimbursement[]        @relation("UserReimbursements")
-  history        ReimbursementHistory[]
+  reembolsos SolicitacaoDeReembolso[] @relation("UserReimbursements")
+  historico  HistoricoDaSolicitacao[]
 }
 
-// ReimbursementStatus values: RASCUNHO | ENVIADO | APROVADO | REJEITADO | PAGO | CANCELADO
-model Reimbursement {
-  id              Int      @id @default(autoincrement())
-  solicitanteId   Int
-  categoriaId     Int
-  description     String
-  amount          Float
-  expenseDate     DateTime
-  status          String   @default("RASCUNHO")
-  rejectionReason String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+// ReembolsoStatus values: RASCUNHO | ENVIADO | APROVADO | REJEITADO | PAGO | CANCELADO
+model SolicitacaoDeReembolso {
+  id                    Int      @id @default(autoincrement())
+  solicitanteId         Int
+  categoriaId           Int
+  descricao             String
+  valor                 Float
+  dataDespesa           DateTime
+  status                String   @default("RASCUNHO")
+  justificativaRejeicao String?
+  criadoEm              DateTime @default(now())
+  atualizadoEm          DateTime @updatedAt
 
-  requester   User                   @relation("UserReimbursements", fields: [solicitanteId], references: [id])
-  category    Category               @relation(fields: [categoriaId], references: [id])
-  attachments Attachment[]
-  history     ReimbursementHistory[]
+  solicitante Usuario                  @relation("UserReimbursements", fields: [solicitanteId], references: [id])
+  categoria   Categoria                @relation(fields: [categoriaId], references: [id])
+  anexos      Anexo[]
+  historico   HistoricoDaSolicitacao[]
 }
 
-model Category {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Categoria {
+  id           Int      @id @default(autoincrement())
+  nome         String   @unique
+  ativo        Boolean  @default(true)
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
 
-  reimbursements Reimbursement[]
+  reembolsos SolicitacaoDeReembolso[]
 }
 
-model Attachment {
+model Anexo {
   id            Int      @id @default(autoincrement())
   solicitacaoId Int
-  fileName      String
-  fileUrl       String
-  fileType      String
-  createdAt     DateTime @default(now())
+  nomeArquivo   String
+  urlArquivo    String
+  tipoArquivo   String
+  criadoEm      DateTime @default(now())
 
-  reimbursement Reimbursement @relation(fields: [solicitacaoId], references: [id])
+  reembolso SolicitacaoDeReembolso @relation(fields: [solicitacaoId], references: [id])
 }
 
 // HistoryAction values: CREATED | UPDATED | SUBMITTED | APPROVED | REJECTED | PAID | CANCELED
-model ReimbursementHistory {
+model HistoricoDaSolicitacao {
   id            Int      @id @default(autoincrement())
   solicitacaoId Int
   usuarioId     Int
-  action        String
-  observation   String?
-  createdAt     DateTime @default(now())
+  acao          String
+  observacao    String?
+  criadoEm      DateTime @default(now())
 
-  reimbursement Reimbursement @relation(fields: [solicitacaoId], references: [id])
-  user          User          @relation(fields: [usuarioId], references: [id])
+  reembolso SolicitacaoDeReembolso @relation(fields: [solicitacaoId], references: [id])
+  usuario   Usuario                @relation(fields: [usuarioId], references: [id])
 }
