@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// Role values: COLABORADOR | GESTOR | FINANCEIRO | ADMIN
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("COLABORADOR")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reimbursements Reimbursement[]        @relation("UserReimbursements")
+  history        ReimbursementHistory[]
+}
+
+// ReimbursementStatus values: RASCUNHO | ENVIADO | APROVADO | REJEITADO | PAGO | CANCELADO
+model Reimbursement {
+  id              Int      @id @default(autoincrement())
+  solicitanteId   Int
+  categoriaId     Int
+  description     String
+  amount          Float
+  expenseDate     DateTime
+  status          String   @default("RASCUNHO")
+  rejectionReason String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  requester   User                   @relation("UserReimbursements", fields: [solicitanteId], references: [id])
+  category    Category               @relation(fields: [categoriaId], references: [id])
+  attachments Attachment[]
+  history     ReimbursementHistory[]
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reimbursements Reimbursement[]
+}
+
+model Attachment {
+  id            Int      @id @default(autoincrement())
+  solicitacaoId Int
+  fileName      String
+  fileUrl       String
+  fileType      String
+  createdAt     DateTime @default(now())
+
+  reimbursement Reimbursement @relation(fields: [solicitacaoId], references: [id])
+}
+
+// HistoryAction values: CREATED | UPDATED | SUBMITTED | APPROVED | REJECTED | PAID | CANCELED
+model ReimbursementHistory {
+  id            Int      @id @default(autoincrement())
+  solicitacaoId Int
+  usuarioId     Int
+  action        String
+  observation   String?
+  createdAt     DateTime @default(now())
+
+  reimbursement Reimbursement @relation(fields: [solicitacaoId], references: [id])
+  user          User          @relation(fields: [usuarioId], references: [id])
+}
