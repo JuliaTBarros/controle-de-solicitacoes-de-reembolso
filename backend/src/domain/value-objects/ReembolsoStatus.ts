@@ -9,7 +9,7 @@ export enum ReembolsoStatus {
 
 export const VALID_TRANSITIONS: Record<ReembolsoStatus, ReembolsoStatus[]> = {
     [ReembolsoStatus.RASCUNHO]: [ReembolsoStatus.ENVIADO, ReembolsoStatus.CANCELADO],
-    [ReembolsoStatus.ENVIADO]: [ReembolsoStatus.APROVADO, ReembolsoStatus.REJEITADO],
+    [ReembolsoStatus.ENVIADO]: [ReembolsoStatus.APROVADO, ReembolsoStatus.REJEITADO, ReembolsoStatus.CANCELADO],
     [ReembolsoStatus.APROVADO]: [ReembolsoStatus.PAGO],
     [ReembolsoStatus.REJEITADO]: [],
     [ReembolsoStatus.PAGO]: [],
