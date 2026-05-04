@@ -48,13 +48,13 @@ export class PrismaReembolsoRepository implements IReembolsoRepository {
 
     async update(id: number, data: Partial<SolicitacaoDeReembolso['props']>): Promise<SolicitacaoDeReembolso> {
         const updateData: Record<string, unknown> = {};
-        if (data.descricao) updateData.descricao = data.descricao;
+        if (data.descricao !== undefined) updateData.descricao = data.descricao;
         if (data.valor !== undefined) updateData.valor = data.valor;
-        if (data.dataDespesa) updateData.dataDespesa = data.dataDespesa;
-        if (data.status) updateData.status = data.status;
+        if (data.dataDespesa !== undefined) updateData.dataDespesa = data.dataDespesa;
+        if (data.status !== undefined) updateData.status = data.status;
         if (data.justificativaRejeicao !== undefined) updateData.justificativaRejeicao = data.justificativaRejeicao;
-        if (data.solicitanteId) updateData.solicitanteId = Number(data.solicitanteId);
-        if (data.categoriaId) updateData.categoriaId = Number(data.categoriaId);
+        if (data.solicitanteId !== undefined) updateData.solicitanteId = Number(data.solicitanteId);
+        if (data.categoriaId !== undefined) updateData.categoriaId = Number(data.categoriaId);
         const record = await prisma.solicitacaoDeReembolso.update({where: {id: Number(id)}, data: updateData});
         return this.toEntity(record);
     }

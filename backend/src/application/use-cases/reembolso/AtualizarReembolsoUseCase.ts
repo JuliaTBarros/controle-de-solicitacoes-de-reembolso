@@ -5,6 +5,7 @@ import {ReembolsoStatus} from '../../../domain/value-objects/ReembolsoStatus';
 import {Money} from '../../../domain/value-objects/Money';
 import {UpdateReimbursementDTO} from '../../dtos/reembolso.dto';
 import {DomainError} from '../../../domain/errors/DomainError';
+import {NotFoundError} from '../../../domain/errors/NotFoundError';
 import {UnauthorizedError} from '../../../domain/errors/UnauthorizedError';
 
 export class AtualizarReembolsoUseCase {
@@ -17,7 +18,7 @@ export class AtualizarReembolsoUseCase {
 
     async execute(id: number, solicitanteId: number, input: UpdateReimbursementDTO) {
         const reembolso = await this.reembolsoRepository.findById(id);
-        if (!reembolso) throw new DomainError('Solicitação não encontrada.', 404);
+        if (!reembolso) throw new NotFoundError('Solicitação de reembolso');
         if (reembolso.solicitanteId !== solicitanteId) throw new UnauthorizedError('Apenas o dono pode editar esta solicitação.');
         if (reembolso.status !== ReembolsoStatus.RASCUNHO) throw new DomainError('Apenas solicitações em rascunho podem ser editadas.', 400);
 
@@ -32,7 +33,7 @@ export class AtualizarReembolsoUseCase {
             ...(input.categoriaId !== undefined && {categoriaId: input.categoriaId}),
             ...(input.descricao !== undefined && {descricao: input.descricao}),
             ...(input.valor !== undefined && {valor: input.valor}),
-            ...(input.dataDespesa !== undefined && {dataDespesa: new Date(input.dataDespesa)}),
+            ...(input.dataDespesa !== undefined && {dataDespesa: input.dataDespesa}),
         });
 
         await this.historicoRepository.create({

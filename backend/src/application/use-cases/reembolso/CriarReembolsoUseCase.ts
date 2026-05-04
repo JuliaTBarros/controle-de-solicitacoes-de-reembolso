@@ -27,7 +27,7 @@ export class CriarReembolsoUseCase {
             categoriaId: input.categoriaId,
             descricao: input.descricao,
             valor: input.valor,
-            dataDespesa: new Date(input.dataDespesa),
+            dataDespesa: input.dataDespesa,
             status: ReembolsoStatus.RASCUNHO,
         });
 
