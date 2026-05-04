@@ -27,6 +27,14 @@ export class Usuario {
         return this.props.perfil;
     }
 
+    get perfil() {
+        return this.props.perfil;
+    }
+
+    get nome() {
+        return this.props.nome;
+    }
+
     get email() {
         return this.props.email;
     }
