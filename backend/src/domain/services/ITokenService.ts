@@ -1,6 +1,8 @@
+import {Role} from '../entities/Usuario';
+
 export interface TokenPayload {
     sub: string;
-    perfil: string;
+    perfil: Role;
 }
 
 export interface ITokenService {

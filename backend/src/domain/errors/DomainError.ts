@@ -1,5 +1,3 @@
-// Classe base para todos os erros de domínio.
-
 export class DomainError extends Error {
     constructor(
         message: string,
