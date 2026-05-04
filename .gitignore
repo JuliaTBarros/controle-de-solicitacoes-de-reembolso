@@ -8,7 +8,5 @@ coverage/
 .DS_Store
 context/
 .idea/
-
-#Prisma SQLite
+.claude
 backend/prisma/dev.db
-backend/prisma/dev.db-journal

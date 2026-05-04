@@ -1,69 +1,69 @@
 -- CreateTable
-CREATE TABLE "User"
+CREATE TABLE "Usuario"
 (
-    "id"        INTEGER  NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "name"      TEXT     NOT NULL,
-    "email"     TEXT     NOT NULL,
-    "password"  TEXT     NOT NULL,
-    "role"      TEXT     NOT NULL DEFAULT 'COLABORADOR',
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "id"          INTEGER  NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "nome"        TEXT     NOT NULL,
+    "email"       TEXT     NOT NULL,
+    "senha"       TEXT     NOT NULL,
+    "perfil"      TEXT     NOT NULL DEFAULT 'COLABORADOR',
+    "criadoEm"    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "atulizadoEm" DATETIME NOT NULL
 );
 
 -- CreateTable
-CREATE TABLE "Reimbursement"
+CREATE TABLE "SolicitacaoDeReembolso"
 (
-    "id"              INTEGER  NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "solicitanteId"   INTEGER  NOT NULL,
-    "categoriaId"     INTEGER  NOT NULL,
-    "description"     TEXT     NOT NULL,
-    "amount"          REAL     NOT NULL,
-    "expenseDate"     DATETIME NOT NULL,
-    "status"          TEXT     NOT NULL DEFAULT 'RASCUNHO',
-    "rejectionReason" TEXT,
-    "createdAt"       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt"       DATETIME NOT NULL,
-    CONSTRAINT "Reimbursement_solicitanteId_fkey" FOREIGN KEY ("solicitanteId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "Reimbursement_categoriaId_fkey" FOREIGN KEY ("categoriaId") REFERENCES "Category" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    "id"                    INTEGER  NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "solicitanteId"         INTEGER  NOT NULL,
+    "categoriaId"           INTEGER  NOT NULL,
+    "descricao"             TEXT     NOT NULL,
+    "valor"                 REAL     NOT NULL,
+    "dataDespesa"           DATETIME NOT NULL,
+    "status"                TEXT     NOT NULL DEFAULT 'RASCUNHO',
+    "justificativaRejeicao" TEXT,
+    "criadoEm"              DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "atulizadoEm"           DATETIME NOT NULL,
+    CONSTRAINT "SolicitacaoDeReembolso_solicitanteId_fkey" FOREIGN KEY ("solicitanteId") REFERENCES "Usuario" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "SolicitacaoDeReembolso_categoriaId_fkey" FOREIGN KEY ("categoriaId") REFERENCES "Categoria" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
-CREATE TABLE "Category"
+CREATE TABLE "Categoria"
 (
-    "id"        INTEGER  NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "name"      TEXT     NOT NULL,
-    "active"    BOOLEAN  NOT NULL DEFAULT true,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "id"          INTEGER  NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "nome"        TEXT     NOT NULL,
+    "ativo"       BOOLEAN  NOT NULL DEFAULT true,
+    "criadoEm"    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "atulizadoEm" DATETIME NOT NULL
 );
 
 -- CreateTable
-CREATE TABLE "Attachment"
+CREATE TABLE "Anexo"
 (
     "id"            INTEGER  NOT NULL PRIMARY KEY AUTOINCREMENT,
     "solicitacaoId" INTEGER  NOT NULL,
-    "fileName"      TEXT     NOT NULL,
-    "fileUrl"       TEXT     NOT NULL,
-    "fileType"      TEXT     NOT NULL,
-    "createdAt"     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "Attachment_solicitacaoId_fkey" FOREIGN KEY ("solicitacaoId") REFERENCES "Reimbursement" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    "nomeArquivo"   TEXT     NOT NULL,
+    "urlArquivo"    TEXT     NOT NULL,
+    "tipoArquivo"   TEXT     NOT NULL,
+    "criadoEm"      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "Anexo_solicitacaoId_fkey" FOREIGN KEY ("solicitacaoId") REFERENCES "SolicitacaoDeReembolso" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
-CREATE TABLE "ReimbursementHistory"
+CREATE TABLE "HistoricoDaSolicitacao"
 (
     "id"            INTEGER  NOT NULL PRIMARY KEY AUTOINCREMENT,
     "solicitacaoId" INTEGER  NOT NULL,
     "usuarioId"     INTEGER  NOT NULL,
-    "action"        TEXT     NOT NULL,
-    "observation"   TEXT,
-    "createdAt"     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "ReimbursementHistory_solicitacaoId_fkey" FOREIGN KEY ("solicitacaoId") REFERENCES "Reimbursement" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "ReimbursementHistory_usuarioId_fkey" FOREIGN KEY ("usuarioId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    "acao"          TEXT     NOT NULL,
+    "observacao"    TEXT,
+    "criadoEm"      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "HistoricoDaSolicitacao_solicitacaoId_fkey" FOREIGN KEY ("solicitacaoId") REFERENCES "SolicitacaoDeReembolso" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "HistoricoDaSolicitacao_usuarioId_fkey" FOREIGN KEY ("usuarioId") REFERENCES "Usuario" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User" ("email");
+CREATE UNIQUE INDEX "Usuario_email_key" ON "Usuario" ("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Category_name_key" ON "Category" ("name");
+CREATE UNIQUE INDEX "Categoria_nome_key" ON "Categoria" ("nome");

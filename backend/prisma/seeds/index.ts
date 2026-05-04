@@ -1,28 +1,41 @@
 import {PrismaClient} from '@prisma/client';
+import {PrismaLibSql} from '@prisma/adapter-libsql';
 import * as bcrypt from 'bcryptjs';
+import 'dotenv/config';
 
-const prisma = new PrismaClient();
+const adapter = new PrismaLibSql({url: process.env.DATABASE_URL!});
+const prisma = new PrismaClient({adapter});
 
 async function main() {
     const hash = (pw: string) => bcrypt.hash(pw, 10);
 
     for (const user of [
-        {name: 'Colaborador Teste', email: 'colaborador@test.com', password: await hash('123456'), role: 'COLABORADOR'},
-        {name: 'Gestor Teste', email: 'gestor@test.com', password: await hash('123456'), role: 'GESTOR'},
-        {name: 'Financeiro Teste', email: 'financeiro@test.com', password: await hash('123456'), role: 'FINANCEIRO'},
-        {name: 'Admin Teste', email: 'admin@test.com', password: await hash('123456'), role: 'ADMIN'},
+        {nome: 'Colaborador Teste', email: 'colaborador@test.com', senha: await hash('123456'), perfil: 'COLABORADOR'},
+        {nome: 'Gestor Teste', email: 'gestor@test.com', senha: await hash('123456'), perfil: 'GESTOR'},
+        {nome: 'Financeiro Teste', email: 'financeiro@test.com', senha: await hash('123456'), perfil: 'FINANCEIRO'},
+        {nome: 'Admin Teste', email: 'admin@test.com', senha: await hash('123456'), perfil: 'ADMIN'},
     ]) {
-        await prisma.user.upsert({where: {email: user.email}, update: {}, create: user});
+        // Changed prisma.user to prisma.usuario
+        await prisma.usuario.upsert({
+            where: {email: user.email},
+            update: {},
+            create: user
+        });
     }
 
     for (const category of [
-        {name: 'Alimentação'},
-        {name: 'Transporte'},
-        {name: 'Hospedagem'},
-        {name: 'Material de escritório'},
-        {name: 'Treinamento'},
+        {nome: 'Alimentação'},
+        {nome: 'Transporte'},
+        {nome: 'Hospedagem'},
+        {nome: 'Material de escritório'},
+        {nome: 'Treinamento'},
     ]) {
-        await prisma.category.upsert({where: {name: category.name}, update: {}, create: category});
+        // Changed prisma.category to prisma.categoria and where clause to use 'nome'
+        await prisma.categoria.upsert({
+            where: {nome: category.nome},
+            update: {},
+            create: category
+        });
     }
 
     console.log('Seed concluído.');
