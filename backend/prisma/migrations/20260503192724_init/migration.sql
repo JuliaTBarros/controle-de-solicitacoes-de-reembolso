@@ -7,7 +7,7 @@ CREATE TABLE "Usuario"
     "senha"       TEXT     NOT NULL,
     "perfil"      TEXT     NOT NULL DEFAULT 'COLABORADOR',
     "criadoEm"    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "atulizadoEm" DATETIME NOT NULL
+    "atualizadoEm" DATETIME NOT NULL
 );
 
 -- CreateTable
@@ -22,7 +22,7 @@ CREATE TABLE "SolicitacaoDeReembolso"
     "status"                TEXT     NOT NULL DEFAULT 'RASCUNHO',
     "justificativaRejeicao" TEXT,
     "criadoEm"              DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "atulizadoEm"           DATETIME NOT NULL,
+    "atualizadoEm"           DATETIME NOT NULL,
     CONSTRAINT "SolicitacaoDeReembolso_solicitanteId_fkey" FOREIGN KEY ("solicitanteId") REFERENCES "Usuario" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT "SolicitacaoDeReembolso_categoriaId_fkey" FOREIGN KEY ("categoriaId") REFERENCES "Categoria" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
@@ -34,7 +34,7 @@ CREATE TABLE "Categoria"
     "nome"        TEXT     NOT NULL,
     "ativo"       BOOLEAN  NOT NULL DEFAULT true,
     "criadoEm"    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "atulizadoEm" DATETIME NOT NULL
+    "atualizadoEm" DATETIME NOT NULL
 );
 
 -- CreateTable
