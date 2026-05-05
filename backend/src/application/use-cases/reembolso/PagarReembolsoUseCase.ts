@@ -19,12 +19,13 @@ export class PagarReembolsoUseCase {
         const to = ReembolsoStatus.PAGO;
         if (!isValidTransition(from, to)) throw new InvalidStatusTransitionError(from, to);
 
-        await this.reembolsoRepository.update(id, {status: to});
+        const updated = await this.reembolsoRepository.update(id, {status: to});
         await this.historicoRepository.create({
             solicitacaoId: id,
             usuarioId: financeiroId,
             acao: HistoryAction.PAID,
             observacao: 'Pagamento realizado pelo financeiro.',
         });
+        return updated;
     }
 }

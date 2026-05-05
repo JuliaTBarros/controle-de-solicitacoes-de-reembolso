@@ -21,12 +21,13 @@ export class CancelarReembolsoUseCase {
         const to = ReembolsoStatus.CANCELADO;
         if (!isValidTransition(from, to)) throw new InvalidStatusTransitionError(from, to);
 
-        await this.reembolsoRepository.update(id, {status: to});
+        const updated = await this.reembolsoRepository.update(id, {status: to});
         await this.historicoRepository.create({
             solicitacaoId: id,
             usuarioId: solicitanteId,
             acao: HistoryAction.CANCELED,
             observacao: 'Solicitação cancelada pelo colaborador.',
         });
+        return updated;
     }
 }

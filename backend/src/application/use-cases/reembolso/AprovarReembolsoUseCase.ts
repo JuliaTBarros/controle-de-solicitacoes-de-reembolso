@@ -19,12 +19,13 @@ export class AprovarReembolsoUseCase {
         const to = ReembolsoStatus.APROVADO;
         if (!isValidTransition(from, to)) throw new InvalidStatusTransitionError(from, to);
 
-        await this.reembolsoRepository.update(id, {status: to});
+        const updated = await this.reembolsoRepository.update(id, {status: to});
         await this.historicoRepository.create({
             solicitacaoId: id,
             usuarioId: gestorId,
             acao: HistoryAction.APPROVED,
             observacao: 'Solicitação aprovada pelo gestor.',
         });
+        return updated;
     }
 }
