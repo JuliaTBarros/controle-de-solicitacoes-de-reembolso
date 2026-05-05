@@ -1,0 +1,31 @@
+import { Money } from '../../../src/domain/value-objects/Money';
+import { DomainError } from '../../../src/domain/errors/DomainError';
+
+describe('Money', () => {
+    it('cria com valor positivo', () => {
+        const m = Money.create(150.5);
+        expect(m.toNumber()).toBe(150.5);
+    });
+
+    it('lança DomainError para valor zero', () => {
+        expect(() => Money.create(0)).toThrow(DomainError);
+    });
+
+    it('lança DomainError para valor negativo', () => {
+        expect(() => Money.create(-1)).toThrow(DomainError);
+    });
+
+    it('lança DomainError com statusCode 400', () => {
+        expect.assertions(1);
+        try {
+            Money.create(-5);
+        } catch (e: any) {
+            expect(e.statusCode).toBe(400);
+        }
+    });
+
+    it('cria com valor de ponto flutuante pequeno', () => {
+        const m = Money.create(0.01);
+        expect(m.toNumber()).toBe(0.01);
+    });
+});
