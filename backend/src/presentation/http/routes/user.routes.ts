@@ -1,24 +1,13 @@
-import {Router, Request, Response, NextFunction} from 'express';
+import {Router} from 'express';
+import {UserController} from '../controllers/UserController';
 import {authMiddleware} from '../middlewares/authMiddleware';
 import {perfilMiddleware} from '../middlewares/perfilMiddleware';
-import {container} from '../../../shared/container';
 
 const router = Router();
+const ctrl = new UserController();
 
 router.use(authMiddleware);
 
-router.get('/', perfilMiddleware('ADMIN'), async (_req: Request, res: Response, next: NextFunction) => {
-    try {
-        const users = await container.userRepository.findAll();
-        res.json(users.map(u => ({
-            id: u.id,
-            nome: u.nome,
-            email: u.email,
-            perfil: u.perfil,
-        })));
-    } catch (err) {
-        next(err);
-    }
-});
+router.get('/', perfilMiddleware('ADMIN'), ctrl.list);
 
 export default router;

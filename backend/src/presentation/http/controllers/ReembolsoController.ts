@@ -1,11 +1,11 @@
 import {Request, Response, NextFunction} from 'express';
-import {container} from '../../../shared/container';
+import {getContainer} from '../../../shared/container';
 
 export class ReembolsoController {
     async create(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = Number((req as any).user.sub);
-            const result = await container.createReimbursementUseCase.execute({
+            const result = await getContainer().criarReembolsoUseCase.execute({
                 ...req.body,
                 solicitanteId: userId,
                 dataDespesa: new Date(req.body.dataDespesa),
@@ -23,7 +23,7 @@ export class ReembolsoController {
                 ...req.body,
                 ...(req.body.dataDespesa && {dataDespesa: new Date(req.body.dataDespesa)}),
             };
-            const result = await container.updateReimbursementUseCase.execute(
+            const result = await getContainer().atualizarReembolsoUseCase.execute(
                 Number(req.params.id),
                 userId,
                 input,
@@ -37,7 +37,7 @@ export class ReembolsoController {
     async submit(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = Number((req as any).user.sub);
-            await container.submitReimbursementUseCase.execute(Number(req.params.id), userId);
+            await getContainer().enviarReembolsoUseCase.execute(Number(req.params.id), userId);
             res.status(204).send();
         } catch (err) {
             next(err);
@@ -47,7 +47,7 @@ export class ReembolsoController {
     async cancel(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = Number((req as any).user.sub);
-            await container.cancelReimbursementUseCase.execute(Number(req.params.id), userId);
+            await getContainer().cancelarReembolsoUseCase.execute(Number(req.params.id), userId);
             res.status(204).send();
         } catch (err) {
             next(err);
@@ -57,7 +57,7 @@ export class ReembolsoController {
     async approve(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = Number((req as any).user.sub);
-            await container.approveReimbursementUseCase.execute(Number(req.params.id), userId);
+            await getContainer().aprovarReembolsoUseCase.execute(Number(req.params.id), userId);
             res.status(204).send();
         } catch (err) {
             next(err);
@@ -67,7 +67,7 @@ export class ReembolsoController {
     async reject(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = Number((req as any).user.sub);
-            await container.rejectReimbursementUseCase.execute(Number(req.params.id), userId, req.body);
+            await getContainer().rejeitarReembolsoUseCase.execute(Number(req.params.id), userId, req.body);
             res.status(204).send();
         } catch (err) {
             next(err);
@@ -77,7 +77,7 @@ export class ReembolsoController {
     async pay(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = Number((req as any).user.sub);
-            await container.payReimbursementUseCase.execute(Number(req.params.id), userId);
+            await getContainer().pagarReembolsoUseCase.execute(Number(req.params.id), userId);
             res.status(204).send();
         } catch (err) {
             next(err);
@@ -87,7 +87,7 @@ export class ReembolsoController {
     async list(req: Request, res: Response, next: NextFunction) {
         try {
             const user = (req as any).user;
-            const result = await container.listReimbursementsUseCase.execute(user);
+            const result = await getContainer().listarReembolsosUseCase.execute(user);
             res.json(result.map(r => r.props));
         } catch (err) {
             next(err);
@@ -97,7 +97,7 @@ export class ReembolsoController {
     async findById(req: Request, res: Response, next: NextFunction) {
         try {
             const user = (req as any).user;
-            const record = await container.getReimbursementByIdUseCase.execute(Number(req.params.id), user);
+            const record = await getContainer().buscarReembolsoPorIdUseCase.execute(Number(req.params.id), user);
             res.json(record.props);
         } catch (err) {
             next(err);
@@ -107,7 +107,7 @@ export class ReembolsoController {
     async history(req: Request, res: Response, next: NextFunction) {
         try {
             const user = (req as any).user;
-            const result = await container.listHistoricoUseCase.execute(Number(req.params.id), user);
+            const result = await getContainer().listarHistoricoUseCase.execute(Number(req.params.id), user);
             res.json(result);
         } catch (err) {
             next(err);

@@ -1,5 +1,5 @@
 import {Request, Response, NextFunction} from 'express';
-import {container} from '../../../shared/container';
+import {getContainer} from '../../../shared/container';
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction) {
     const header = req.headers.authorization;
@@ -9,7 +9,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
 
     try {
         const token = header.split(' ')[1];
-        const payload = container.tokenService.verify(token); // { sub: userId, perfil }
+        const payload = getContainer().servicoDeToken.verify(token);
         (req as any).user = payload;
         next();
     } catch (err: any) {

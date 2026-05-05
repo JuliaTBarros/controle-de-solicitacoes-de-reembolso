@@ -42,10 +42,10 @@ export class PrismaUsuarioRepository implements IUsuarioRepository {
 
     async update(id: number, data: Partial<Usuario['props']>): Promise<Usuario> {
         const updateData: Record<string, unknown> = {};
-        if (data.nome) updateData.nome = data.nome;
-        if (data.email) updateData.email = data.email;
-        if (data.senha) updateData.senha = data.senha;
-        if (data.perfil) updateData.perfil = data.perfil;
+        if (data.nome !== undefined) updateData.nome = data.nome;
+        if (data.email !== undefined) updateData.email = data.email;
+        if (data.senha !== undefined) updateData.senha = data.senha;
+        if (data.perfil !== undefined) updateData.perfil = data.perfil;
         const record = await prisma.usuario.update({where: {id: Number(id)}, data: updateData});
         return this.toEntity(record);
     }

@@ -1,5 +1,4 @@
 import {ReembolsoStatus} from '../value-objects/ReembolsoStatus';
-import {Money} from '../value-objects/Money';
 
 export interface ReembolsoProps {
     id: number;
@@ -16,7 +15,6 @@ export interface ReembolsoProps {
 
 export class SolicitacaoDeReembolso {
     constructor(public readonly props: ReembolsoProps) {
-        Money.create(props.valor);
     }
 
     get id() {
