@@ -1,5 +1,6 @@
 import {Request, Response, NextFunction} from 'express';
 import {getContainer} from '../../../shared/container';
+import dayjs from 'dayjs';
 
 export class ReembolsoController {
     async create(req: Request, res: Response, next: NextFunction) {
@@ -8,7 +9,7 @@ export class ReembolsoController {
             const result = await getContainer().criarReembolsoUseCase.execute({
                 ...req.body,
                 solicitanteId: userId,
-                dataDespesa: new Date(req.body.dataDespesa),
+                dataDespesa: dayjs(req.body.dataDespesa).toDate(),
             });
             res.status(201).json(result.props);
         } catch (err) {
@@ -21,7 +22,7 @@ export class ReembolsoController {
             const userId = Number((req as any).user.sub);
             const input = {
                 ...req.body,
-                ...(req.body.dataDespesa && {dataDespesa: new Date(req.body.dataDespesa)}),
+                ...(req.body.dataDespesa && {dataDespesa: dayjs(req.body.dataDespesa).toDate()}),
             };
             const result = await getContainer().atualizarReembolsoUseCase.execute(
                 Number(req.params.id),

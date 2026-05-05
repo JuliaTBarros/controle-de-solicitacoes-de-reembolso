@@ -4,6 +4,7 @@ import {Anexo} from '../../../domain/entities/Anexo';
 import {NotFoundError} from '../../../domain/errors/NotFoundError';
 import {UnauthorizedError} from '../../../domain/errors/UnauthorizedError';
 import {DomainError} from '../../../domain/errors/DomainError';
+import {ReembolsoStatus} from '../../../domain/value-objects/ReembolsoStatus';
 
 const TIPOS_PERMITIDOS = ['PDF', 'JPG', 'PNG'] as const;
 
@@ -28,6 +29,10 @@ export class CriarAnexoUseCase {
 
         if (reembolso.solicitanteId !== input.solicitanteId) {
             throw new UnauthorizedError('Apenas o dono pode adicionar anexos a esta solicitação.');
+        }
+
+        if (reembolso.status !== ReembolsoStatus.RASCUNHO) {
+            throw new DomainError('Anexos só podem ser adicionados a solicitações em rascunho.', 400);
         }
 
         const tipo = input.tipoArquivo.toUpperCase();
