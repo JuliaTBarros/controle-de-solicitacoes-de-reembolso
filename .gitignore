@@ -10,3 +10,4 @@ context/
 .idea/
 .claude
 backend/prisma/dev.db
+backend/prisma/test.db
