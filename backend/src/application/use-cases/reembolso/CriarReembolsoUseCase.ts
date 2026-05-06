@@ -2,7 +2,7 @@ import {IReembolsoRepository} from '../../../domain/repositories/IReembolsoRepos
 import {ICategoriaRepository} from '../../../domain/repositories/ICategoriaRepository';
 import {IHistoricoRepository, HistoryAction} from '../../../domain/repositories/IHistoricoRepository';
 import {ReembolsoStatus} from '../../../domain/value-objects/ReembolsoStatus';
-import {Money} from '../../../domain/value-objects/Money';
+import {Dinheiro} from '../../../domain/value-objects/Dinheiro';
 import {CreateReimbursementDTO} from '../../dtos/reembolso.dto';
 import {DomainError} from '../../../domain/errors/DomainError';
 
@@ -15,7 +15,7 @@ export class CriarReembolsoUseCase {
     }
 
     async execute(input: CreateReimbursementDTO) {
-        Money.create(input.valor);
+        Dinheiro.create(input.valor);
 
         const categoria = await this.categoriaRepository.findById(input.categoriaId);
         if (!categoria || !categoria.isActive()) {

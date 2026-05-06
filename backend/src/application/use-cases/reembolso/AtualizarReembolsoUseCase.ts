@@ -2,7 +2,7 @@ import {IReembolsoRepository} from '../../../domain/repositories/IReembolsoRepos
 import {IHistoricoRepository, HistoryAction} from '../../../domain/repositories/IHistoricoRepository';
 import {ICategoriaRepository} from '../../../domain/repositories/ICategoriaRepository';
 import {ReembolsoStatus} from '../../../domain/value-objects/ReembolsoStatus';
-import {Money} from '../../../domain/value-objects/Money';
+import {Dinheiro} from '../../../domain/value-objects/Dinheiro';
 import {UpdateReimbursementDTO} from '../../dtos/reembolso.dto';
 import {DomainError} from '../../../domain/errors/DomainError';
 import {NotFoundError} from '../../../domain/errors/NotFoundError';
@@ -22,7 +22,7 @@ export class AtualizarReembolsoUseCase {
         if (reembolso.solicitanteId !== solicitanteId) throw new UnauthorizedError('Apenas o dono pode editar esta solicitação.');
         if (reembolso.status !== ReembolsoStatus.RASCUNHO) throw new DomainError('Apenas solicitações em rascunho podem ser editadas.', 400);
 
-        if (input.valor !== undefined) Money.create(input.valor);
+        if (input.valor !== undefined) Dinheiro.create(input.valor);
 
         if (input.categoriaId !== undefined) {
             const categoria = await this.categoriaRepository.findById(input.categoriaId);

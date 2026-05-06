@@ -78,6 +78,27 @@ describe('CriarAnexoUseCase', () => {
         await expect(useCase.execute({ ...validInput, solicitanteId: 99 })).rejects.toThrow(UnauthorizedError);
     });
 
+    it('lança DomainError se status não for RASCUNHO', async () => {
+        const enviado = new SolicitacaoDeReembolso({
+            id: 1, solicitanteId: 1, categoriaId: 1, descricao: 'Despesa',
+            valor: 100, dataDespesa: new Date(), status: ReembolsoStatus.ENVIADO,
+            criadoEm: new Date(), atualizadoEm: new Date(),
+        });
+        repos.reembolso.findById.mockResolvedValue(enviado);
+        await expect(useCase.execute(validInput)).rejects.toThrow(DomainError);
+    });
+
+    it('não cria anexo em solicitação APROVADA', async () => {
+        const aprovado = new SolicitacaoDeReembolso({
+            id: 1, solicitanteId: 1, categoriaId: 1, descricao: 'Despesa',
+            valor: 100, dataDespesa: new Date(), status: ReembolsoStatus.APROVADO,
+            criadoEm: new Date(), atualizadoEm: new Date(),
+        });
+        repos.reembolso.findById.mockResolvedValue(aprovado);
+        await expect(useCase.execute(validInput)).rejects.toThrow(DomainError);
+        expect(repos.anexo.create).not.toHaveBeenCalled();
+    });
+
     it('lança DomainError para tipo de arquivo inválido', async () => {
         repos.reembolso.findById.mockResolvedValue(reembolsoMock);
         await expect(useCase.execute({ ...validInput, tipoArquivo: 'DOCX' })).rejects.toThrow(DomainError);
