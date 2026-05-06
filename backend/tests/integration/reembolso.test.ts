@@ -195,6 +195,11 @@ describe('Reimbursements API', () => {
                 .set('Authorization', `Bearer ${colaboradorToken}`)
                 .send({ categoriaId, descricao: 'Despesa para busca', valor: 50, dataDespesa: new Date().toISOString() });
             reimbursementId = res.body.id;
+
+            // GESTOR só visualiza status ENVIADO ou posterior — precisa submeter antes
+            await request(app)
+                .post(`/reimbursements/${reimbursementId}/submit`)
+                .set('Authorization', `Bearer ${colaboradorToken}`);
         });
 
         it('retorna 401 sem token', async () => {

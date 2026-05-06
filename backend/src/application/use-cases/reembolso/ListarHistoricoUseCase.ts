@@ -20,12 +20,14 @@ export class ListarHistoricoUseCase {
             throw new UnauthorizedError('Você não tem permissão para visualizar o histórico desta solicitação.');
         }
 
-        if (usuario.perfil === Role.GESTOR && reembolso.status !== ReembolsoStatus.ENVIADO) {
-            throw new UnauthorizedError('Gestores só podem visualizar o histórico de solicitações enviadas.');
+        const gestorStatuses = [ReembolsoStatus.ENVIADO, ReembolsoStatus.APROVADO, ReembolsoStatus.REJEITADO];
+        if (usuario.perfil === Role.GESTOR && !gestorStatuses.includes(reembolso.status)) {
+            throw new UnauthorizedError('Gestores só podem visualizar o histórico de solicitações enviadas, aprovadas ou rejeitadas.');
         }
 
-        if (usuario.perfil === Role.FINANCEIRO && reembolso.status !== ReembolsoStatus.APROVADO) {
-            throw new UnauthorizedError('Financeiro só pode visualizar o histórico de solicitações aprovadas.');
+        const financeiroStatuses = [ReembolsoStatus.APROVADO, ReembolsoStatus.PAGO];
+        if (usuario.perfil === Role.FINANCEIRO && !financeiroStatuses.includes(reembolso.status)) {
+            throw new UnauthorizedError('Financeiro só pode visualizar o histórico de solicitações aprovadas ou pagas.');
         }
 
         return this.historicoRepository.findBySolicitacaoId(solicitacaoId);

@@ -57,8 +57,8 @@ export class ReembolsoController {
 
     async approve(req: Request, res: Response, next: NextFunction) {
         try {
-            const userId = Number((req as any).user.sub);
-            const result = await getContainer().aprovarReembolsoUseCase.execute(Number(req.params.id), userId);
+            const user = (req as any).user;
+            const result = await getContainer().aprovarReembolsoUseCase.execute(Number(req.params.id), user);
             res.json(result.props);
         } catch (err) {
             next(err);
@@ -67,8 +67,8 @@ export class ReembolsoController {
 
     async reject(req: Request, res: Response, next: NextFunction) {
         try {
-            const userId = Number((req as any).user.sub);
-            const result = await getContainer().rejeitarReembolsoUseCase.execute(Number(req.params.id), userId, req.body);
+            const user = (req as any).user;
+            const result = await getContainer().rejeitarReembolsoUseCase.execute(Number(req.params.id), user, req.body);
             res.json(result.props);
         } catch (err) {
             next(err);
@@ -77,8 +77,8 @@ export class ReembolsoController {
 
     async pay(req: Request, res: Response, next: NextFunction) {
         try {
-            const userId = Number((req as any).user.sub);
-            const result = await getContainer().pagarReembolsoUseCase.execute(Number(req.params.id), userId);
+            const user = (req as any).user;
+            const result = await getContainer().pagarReembolsoUseCase.execute(Number(req.params.id), user);
             res.json(result.props);
         } catch (err) {
             next(err);

@@ -11,10 +11,10 @@ const makeRepos = () => ({
     historico: { create: jest.fn(), findBySolicitacaoId: jest.fn() },
 });
 
-const buildReembolso = (solicitanteId = 1) =>
+const buildReembolso = (solicitanteId = 1, status = ReembolsoStatus.RASCUNHO) =>
     new SolicitacaoDeReembolso({
         id: 1, solicitanteId, categoriaId: 1, descricao: 'Despesa',
-        valor: 100, dataDespesa: new Date(), status: ReembolsoStatus.RASCUNHO,
+        valor: 100, dataDespesa: new Date(), status,
         criadoEm: new Date(), atualizadoEm: new Date(),
     });
 
@@ -47,22 +47,54 @@ describe('ListarHistoricoUseCase', () => {
         expect(result).toHaveLength(3);
     });
 
-    it('GESTOR pode ver histórico de qualquer solicitação', async () => {
-        repos.reembolso.findById.mockResolvedValue(buildReembolso(1));
+    it('GESTOR pode ver histórico de solicitação ENVIADA', async () => {
+        repos.reembolso.findById.mockResolvedValue(buildReembolso(1, ReembolsoStatus.ENVIADO));
         repos.historico.findBySolicitacaoId.mockResolvedValue(historicoMock);
 
         const result = await useCase.execute(1, gestor);
-
         expect(result).toBe(historicoMock);
     });
 
-    it('FINANCEIRO pode ver histórico de qualquer solicitação', async () => {
-        repos.reembolso.findById.mockResolvedValue(buildReembolso(1));
+    it('GESTOR pode ver histórico de solicitação APROVADA', async () => {
+        repos.reembolso.findById.mockResolvedValue(buildReembolso(1, ReembolsoStatus.APROVADO));
+        repos.historico.findBySolicitacaoId.mockResolvedValue(historicoMock);
+
+        const result = await useCase.execute(1, gestor);
+        expect(result).toBeDefined();
+    });
+
+    it('GESTOR pode ver histórico de solicitação REJEITADA', async () => {
+        repos.reembolso.findById.mockResolvedValue(buildReembolso(1, ReembolsoStatus.REJEITADO));
+        repos.historico.findBySolicitacaoId.mockResolvedValue(historicoMock);
+
+        const result = await useCase.execute(1, gestor);
+        expect(result).toBeDefined();
+    });
+
+    it('lança UnauthorizedError se GESTOR tentar ver histórico de solicitação em RASCUNHO', async () => {
+        repos.reembolso.findById.mockResolvedValue(buildReembolso(1, ReembolsoStatus.RASCUNHO));
+        await expect(useCase.execute(1, gestor)).rejects.toThrow(UnauthorizedError);
+    });
+
+    it('FINANCEIRO pode ver histórico de solicitação APROVADA', async () => {
+        repos.reembolso.findById.mockResolvedValue(buildReembolso(1, ReembolsoStatus.APROVADO));
         repos.historico.findBySolicitacaoId.mockResolvedValue(historicoMock);
 
         const result = await useCase.execute(1, financeiro);
-
         expect(result).toBeDefined();
+    });
+
+    it('FINANCEIRO pode ver histórico de solicitação PAGA', async () => {
+        repos.reembolso.findById.mockResolvedValue(buildReembolso(1, ReembolsoStatus.PAGO));
+        repos.historico.findBySolicitacaoId.mockResolvedValue(historicoMock);
+
+        const result = await useCase.execute(1, financeiro);
+        expect(result).toBeDefined();
+    });
+
+    it('lança UnauthorizedError se FINANCEIRO tentar ver histórico de solicitação em ENVIADO', async () => {
+        repos.reembolso.findById.mockResolvedValue(buildReembolso(1, ReembolsoStatus.ENVIADO));
+        await expect(useCase.execute(1, financeiro)).rejects.toThrow(UnauthorizedError);
     });
 
     it('retorna histórico vazio quando não há registros', async () => {
@@ -70,12 +102,11 @@ describe('ListarHistoricoUseCase', () => {
         repos.historico.findBySolicitacaoId.mockResolvedValue([]);
 
         const result = await useCase.execute(1, colaborador('1'));
-
         expect(result).toEqual([]);
     });
 
     it('consulta histórico pelo id da solicitação correto', async () => {
-        repos.reembolso.findById.mockResolvedValue(buildReembolso(1));
+        repos.reembolso.findById.mockResolvedValue(buildReembolso(1, ReembolsoStatus.ENVIADO));
         repos.historico.findBySolicitacaoId.mockResolvedValue([]);
 
         await useCase.execute(5, gestor);
@@ -86,29 +117,23 @@ describe('ListarHistoricoUseCase', () => {
 
     it('lança NotFoundError se solicitação não existir', async () => {
         repos.reembolso.findById.mockResolvedValue(null);
-
         await expect(useCase.execute(99, gestor)).rejects.toThrow(NotFoundError);
     });
 
     it('não consulta histórico se a solicitação não existir', async () => {
         repos.reembolso.findById.mockResolvedValue(null);
-
         await expect(useCase.execute(99, gestor)).rejects.toThrow();
-
         expect(repos.historico.findBySolicitacaoId).not.toHaveBeenCalled();
     });
 
     it('lança UnauthorizedError se COLABORADOR tentar ver histórico de outra solicitação', async () => {
         repos.reembolso.findById.mockResolvedValue(buildReembolso(2));
-
         await expect(useCase.execute(1, colaborador('1'))).rejects.toThrow(UnauthorizedError);
     });
 
     it('não consulta histórico se COLABORADOR não tiver permissão', async () => {
         repos.reembolso.findById.mockResolvedValue(buildReembolso(2));
-
         await expect(useCase.execute(1, colaborador('1'))).rejects.toThrow();
-
         expect(repos.historico.findBySolicitacaoId).not.toHaveBeenCalled();
     });
 });

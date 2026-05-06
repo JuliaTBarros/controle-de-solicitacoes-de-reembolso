@@ -11,10 +11,10 @@ const makeRepos = () => ({
     anexo: { create: jest.fn(), findBySolicitacaoId: jest.fn(), findById: jest.fn(), delete: jest.fn() },
 });
 
-const buildReembolso = (solicitanteId = 1) =>
+const buildReembolso = (solicitanteId = 1, status = ReembolsoStatus.RASCUNHO) =>
     new SolicitacaoDeReembolso({
         id: 1, solicitanteId, categoriaId: 1, descricao: 'Despesa',
-        valor: 100, dataDespesa: new Date(), status: ReembolsoStatus.RASCUNHO,
+        valor: 100, dataDespesa: new Date(), status,
         criadoEm: new Date(), atualizadoEm: new Date(),
     });
 
@@ -46,35 +46,58 @@ describe('ListarAnexosUseCase', () => {
         expect(result).toHaveLength(2);
     });
 
-    it('GESTOR pode listar anexos de qualquer solicitação', async () => {
-        repos.reembolso.findById.mockResolvedValue(buildReembolso(1));
+    it('GESTOR pode listar anexos de solicitação ENVIADA', async () => {
+        repos.reembolso.findById.mockResolvedValue(buildReembolso(1, ReembolsoStatus.ENVIADO));
         repos.anexo.findBySolicitacaoId.mockResolvedValue(anexosMock);
 
         const result = await useCase.execute(1, gestor);
-
         expect(result).toBe(anexosMock);
     });
 
-    it('FINANCEIRO pode listar anexos de qualquer solicitação', async () => {
-        repos.reembolso.findById.mockResolvedValue(buildReembolso(1));
+    it('GESTOR pode listar anexos de solicitação APROVADA', async () => {
+        repos.reembolso.findById.mockResolvedValue(buildReembolso(1, ReembolsoStatus.APROVADO));
         repos.anexo.findBySolicitacaoId.mockResolvedValue(anexosMock);
 
-        const result = await useCase.execute(1, financeiro);
-
+        const result = await useCase.execute(1, gestor);
         expect(result).toBeDefined();
     });
 
-    it('retorna lista vazia quando não há anexos', async () => {
-        repos.reembolso.findById.mockResolvedValue(buildReembolso(1));
-        repos.anexo.findBySolicitacaoId.mockResolvedValue([]);
+    it('GESTOR pode listar anexos de solicitação REJEITADA', async () => {
+        repos.reembolso.findById.mockResolvedValue(buildReembolso(1, ReembolsoStatus.REJEITADO));
+        repos.anexo.findBySolicitacaoId.mockResolvedValue(anexosMock);
 
-        const result = await useCase.execute(1, colaborador('1'));
+        const result = await useCase.execute(1, gestor);
+        expect(result).toBeDefined();
+    });
 
-        expect(result).toEqual([]);
+    it('lança UnauthorizedError se GESTOR tentar listar anexos de solicitação em RASCUNHO', async () => {
+        repos.reembolso.findById.mockResolvedValue(buildReembolso(1, ReembolsoStatus.RASCUNHO));
+        await expect(useCase.execute(1, gestor)).rejects.toThrow(UnauthorizedError);
+    });
+
+    it('FINANCEIRO pode listar anexos de solicitação APROVADA', async () => {
+        repos.reembolso.findById.mockResolvedValue(buildReembolso(1, ReembolsoStatus.APROVADO));
+        repos.anexo.findBySolicitacaoId.mockResolvedValue(anexosMock);
+
+        const result = await useCase.execute(1, financeiro);
+        expect(result).toBeDefined();
+    });
+
+    it('FINANCEIRO pode listar anexos de solicitação PAGA', async () => {
+        repos.reembolso.findById.mockResolvedValue(buildReembolso(1, ReembolsoStatus.PAGO));
+        repos.anexo.findBySolicitacaoId.mockResolvedValue(anexosMock);
+
+        const result = await useCase.execute(1, financeiro);
+        expect(result).toBeDefined();
+    });
+
+    it('lança UnauthorizedError se FINANCEIRO tentar listar anexos de solicitação em ENVIADO', async () => {
+        repos.reembolso.findById.mockResolvedValue(buildReembolso(1, ReembolsoStatus.ENVIADO));
+        await expect(useCase.execute(1, financeiro)).rejects.toThrow(UnauthorizedError);
     });
 
     it('consulta anexos pelo id da solicitação correto', async () => {
-        repos.reembolso.findById.mockResolvedValue(buildReembolso(1));
+        repos.reembolso.findById.mockResolvedValue(buildReembolso(1, ReembolsoStatus.ENVIADO));
         repos.anexo.findBySolicitacaoId.mockResolvedValue([]);
 
         await useCase.execute(7, gestor);
@@ -83,31 +106,33 @@ describe('ListarAnexosUseCase', () => {
         expect(repos.anexo.findBySolicitacaoId).toHaveBeenCalledWith(7);
     });
 
+    it('retorna lista vazia quando não há anexos', async () => {
+        repos.reembolso.findById.mockResolvedValue(buildReembolso(1));
+        repos.anexo.findBySolicitacaoId.mockResolvedValue([]);
+
+        const result = await useCase.execute(1, colaborador('1'));
+        expect(result).toEqual([]);
+    });
+
     it('lança NotFoundError se solicitação não existir', async () => {
         repos.reembolso.findById.mockResolvedValue(null);
-
         await expect(useCase.execute(99, gestor)).rejects.toThrow(NotFoundError);
     });
 
     it('não consulta anexos se solicitação não existir', async () => {
         repos.reembolso.findById.mockResolvedValue(null);
-
         await expect(useCase.execute(99, gestor)).rejects.toThrow();
-
         expect(repos.anexo.findBySolicitacaoId).not.toHaveBeenCalled();
     });
 
     it('lança UnauthorizedError se COLABORADOR tentar ver anexos de outra solicitação', async () => {
         repos.reembolso.findById.mockResolvedValue(buildReembolso(2));
-
         await expect(useCase.execute(1, colaborador('1'))).rejects.toThrow(UnauthorizedError);
     });
 
     it('não consulta anexos se COLABORADOR não tiver permissão', async () => {
         repos.reembolso.findById.mockResolvedValue(buildReembolso(2));
-
         await expect(useCase.execute(1, colaborador('1'))).rejects.toThrow();
-
         expect(repos.anexo.findBySolicitacaoId).not.toHaveBeenCalled();
     });
 });

@@ -1,8 +1,10 @@
 import {IReembolsoRepository} from '../../../domain/repositories/IReembolsoRepository';
 import {IHistoricoRepository, HistoryAction} from '../../../domain/repositories/IHistoricoRepository';
 import {ReembolsoStatus, isValidTransition} from '../../../domain/value-objects/ReembolsoStatus';
+import {Role} from '../../../domain/entities/Usuario';
 import {NotFoundError} from '../../../domain/errors/NotFoundError';
 import {InvalidStatusTransitionError} from '../../../domain/errors/InvalidStatusTransitionError';
+import {UnauthorizedError} from '../../../domain/errors/UnauthorizedError';
 
 export class PagarReembolsoUseCase {
     constructor(
@@ -11,7 +13,9 @@ export class PagarReembolsoUseCase {
     ) {
     }
 
-    async execute(id: number, financeiroId: number) {
+    async execute(id: number, usuario: { sub: string; perfil: Role }) {
+        if (usuario.perfil !== Role.FINANCEIRO) throw new UnauthorizedError('Apenas o financeiro pode marcar solicitações como pagas.');
+
         const reembolso = await this.reembolsoRepository.findById(id);
         if (!reembolso) throw new NotFoundError('Solicitação de reembolso');
 
@@ -22,7 +26,7 @@ export class PagarReembolsoUseCase {
         const updated = await this.reembolsoRepository.update(id, {status: to});
         await this.historicoRepository.create({
             solicitacaoId: id,
-            usuarioId: financeiroId,
+            usuarioId: Number(usuario.sub),
             acao: HistoryAction.PAID,
             observacao: 'Pagamento realizado pelo financeiro.',
         });

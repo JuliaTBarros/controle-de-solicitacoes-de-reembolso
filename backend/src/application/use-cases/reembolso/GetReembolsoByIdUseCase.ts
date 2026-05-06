@@ -17,12 +17,14 @@ export class GetReembolsoByIdUseCase {
             throw new UnauthorizedError('Você não tem permissão para visualizar esta solicitação.');
         }
 
-        if (usuario.perfil === Role.GESTOR && reembolso.status !== ReembolsoStatus.ENVIADO) {
-            throw new UnauthorizedError('Gestores só podem visualizar solicitações enviadas.');
+        const gestorStatuses = [ReembolsoStatus.ENVIADO, ReembolsoStatus.APROVADO, ReembolsoStatus.REJEITADO];
+        if (usuario.perfil === Role.GESTOR && !gestorStatuses.includes(reembolso.status)) {
+            throw new UnauthorizedError('Gestores só podem visualizar solicitações enviadas, aprovadas ou rejeitadas.');
         }
 
-        if (usuario.perfil === Role.FINANCEIRO && reembolso.status !== ReembolsoStatus.APROVADO) {
-            throw new UnauthorizedError('Financeiro só pode visualizar solicitações aprovadas.');
+        const financeiroStatuses = [ReembolsoStatus.APROVADO, ReembolsoStatus.PAGO];
+        if (usuario.perfil === Role.FINANCEIRO && !financeiroStatuses.includes(reembolso.status)) {
+            throw new UnauthorizedError('Financeiro só pode visualizar solicitações aprovadas ou pagas.');
         }
 
         return reembolso;

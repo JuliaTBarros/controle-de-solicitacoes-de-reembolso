@@ -1,8 +1,10 @@
 import {IReembolsoRepository} from '../../../domain/repositories/IReembolsoRepository';
 import {IHistoricoRepository, HistoryAction} from '../../../domain/repositories/IHistoricoRepository';
 import {ReembolsoStatus, isValidTransition} from '../../../domain/value-objects/ReembolsoStatus';
+import {Role} from '../../../domain/entities/Usuario';
 import {NotFoundError} from '../../../domain/errors/NotFoundError';
 import {InvalidStatusTransitionError} from '../../../domain/errors/InvalidStatusTransitionError';
+import {UnauthorizedError} from '../../../domain/errors/UnauthorizedError';
 
 export class AprovarReembolsoUseCase {
     constructor(
@@ -11,7 +13,9 @@ export class AprovarReembolsoUseCase {
     ) {
     }
 
-    async execute(id: number, gestorId: number) {
+    async execute(id: number, usuario: { sub: string; perfil: Role }) {
+        if (usuario.perfil !== Role.GESTOR) throw new UnauthorizedError('Apenas gestores podem aprovar solicitações.');
+
         const reembolso = await this.reembolsoRepository.findById(id);
         if (!reembolso) throw new NotFoundError('Solicitação de reembolso');
 
@@ -22,7 +26,7 @@ export class AprovarReembolsoUseCase {
         const updated = await this.reembolsoRepository.update(id, {status: to});
         await this.historicoRepository.create({
             solicitacaoId: id,
-            usuarioId: gestorId,
+            usuarioId: Number(usuario.sub),
             acao: HistoryAction.APPROVED,
             observacao: 'Solicitação aprovada pelo gestor.',
         });

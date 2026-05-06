@@ -7,6 +7,9 @@ export enum ReembolsoStatus {
     CANCELADO = 'CANCELADO',
 }
 
+// ENVIADO → CANCELADO é permitido intencionalmente: o colaborador pode desistir de uma solicitação
+// já enviada antes que o gestor tome uma decisão. A rota /cancel exige perfil COLABORADOR e o
+// use case verifica a posse da solicitação, impedindo cancelamentos indevidos.
 export const VALID_TRANSITIONS: Record<ReembolsoStatus, ReembolsoStatus[]> = {
     [ReembolsoStatus.RASCUNHO]: [ReembolsoStatus.ENVIADO, ReembolsoStatus.CANCELADO],
     [ReembolsoStatus.ENVIADO]: [ReembolsoStatus.APROVADO, ReembolsoStatus.REJEITADO, ReembolsoStatus.CANCELADO],
