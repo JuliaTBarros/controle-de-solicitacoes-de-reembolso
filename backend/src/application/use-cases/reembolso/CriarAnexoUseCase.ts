@@ -31,6 +31,8 @@ export class CriarAnexoUseCase {
             throw new UnauthorizedError('Apenas o dono pode adicionar anexos a esta solicitação.');
         }
 
+        // Decisão de design: anexos só são permitidos em RASCUNHO para evitar alteração de evidências
+        // após o envio para análise. Solicitações em outros status são consideradas imutáveis.
         if (reembolso.status !== ReembolsoStatus.RASCUNHO) {
             throw new DomainError('Anexos só podem ser adicionados a solicitações em rascunho.', 400);
         }
