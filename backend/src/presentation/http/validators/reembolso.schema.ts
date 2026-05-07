@@ -10,6 +10,9 @@ export const createReimbursementSchema = z.object({
 });
 
 export const updateReimbursementSchema = z.object({
+    params: z.object({
+        id: z.coerce.number().int().positive('ID deve ser um número inteiro positivo.'),
+    }),
     body: z.object({
         categoriaId: z.number().int().positive().optional(),
         descricao: z.string().min(5).optional(),
@@ -19,6 +22,9 @@ export const updateReimbursementSchema = z.object({
 });
 
 export const rejectReimbursementSchema = z.object({
+    params: z.object({
+        id: z.coerce.number().int().positive('ID deve ser um número inteiro positivo.'),
+    }),
     body: z.object({
         justificativaRejeicao: z.string().min(1, 'A justificativa de rejeição é obrigatória.'),
     }),
