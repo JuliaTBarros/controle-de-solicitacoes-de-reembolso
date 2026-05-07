@@ -7,6 +7,7 @@ export default {
     setupFiles: ['<rootDir>/tests/env.setup.ts'],
     setupFilesAfterEnv: ['<rootDir>/tests/dbSetup.ts'],
     collectCoverageFrom: ['src/**/*.ts', '!src/server.ts'],
+    maxWorkers: 1,
     globals: {
         'ts-jest': {
             tsconfig: 'tsconfig.test.json',
