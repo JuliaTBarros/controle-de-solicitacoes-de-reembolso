@@ -5,6 +5,7 @@ import {ReembolsoStatus} from '../../../domain/value-objects/ReembolsoStatus';
 import {Dinheiro} from '../../../domain/value-objects/Dinheiro';
 import {CreateReimbursementDTO} from '../../dtos/reembolso.dto';
 import {DomainError} from '../../../domain/errors/DomainError';
+import {NotFoundError} from "../../../domain/errors/NotFoundError";
 
 export class CriarReembolsoUseCase {
     constructor(
@@ -18,9 +19,10 @@ export class CriarReembolsoUseCase {
         Dinheiro.create(input.valor);
 
         const categoria = await this.categoriaRepository.findById(input.categoriaId);
-        if (!categoria || !categoria.isActive()) {
-            throw new DomainError('Categoria não encontrada ou inativa.', 400);
-        }
+        if (!categoria) throw new
+        NotFoundError('Categoria');
+        if (!categoria.isActive()) throw new
+        DomainError('Categoria inativa.', 400);
 
         const reembolso = await this.reembolsoRepository.create({
             solicitanteId: input.solicitanteId,
