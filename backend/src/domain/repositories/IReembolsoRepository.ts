@@ -3,7 +3,7 @@ import {ReembolsoStatus} from '../value-objects/ReembolsoStatus';
 
 export interface ListReimbursementsFilters {
     solicitanteId?: number;
-    status?: ReembolsoStatus;
+    status?: ReembolsoStatus | ReembolsoStatus[];
     categoriaId?: number;
 }
 

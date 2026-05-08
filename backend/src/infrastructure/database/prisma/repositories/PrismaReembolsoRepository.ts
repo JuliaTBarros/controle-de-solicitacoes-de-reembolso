@@ -38,10 +38,14 @@ export class PrismaReembolsoRepository implements IReembolsoRepository {
     }
 
     async findAll(filters?: ListReimbursementsFilters): Promise<SolicitacaoDeReembolso[]> {
-        const where: { solicitanteId?: number; categoriaId?: number; status?: string } = {};
+        const where: { solicitanteId?: number; categoriaId?: number; status?: string | { in: string[] } } = {};
         if (filters?.solicitanteId) where.solicitanteId = Number(filters.solicitanteId);
         if (filters?.categoriaId) where.categoriaId = Number(filters.categoriaId);
-        if (filters?.status) where.status = filters.status;
+        if (filters?.status) {
+            where.status = Array.isArray(filters.status)
+                ? { in: filters.status }
+                : filters.status;
+        }
         const records = await prisma.solicitacaoDeReembolso.findMany({where});
         return records.map(r => this.toEntity(r));
     }

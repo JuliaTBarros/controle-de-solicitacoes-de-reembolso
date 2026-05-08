@@ -13,7 +13,7 @@ export class ListarReembolsosUseCase {
             case Role.GESTOR:
                 return this.reembolsoRepository.findAll({status: ReembolsoStatus.ENVIADO});
             case Role.FINANCEIRO:
-                return this.reembolsoRepository.findAll({status: ReembolsoStatus.APROVADO});
+                return this.reembolsoRepository.findAll({status: [ReembolsoStatus.APROVADO, ReembolsoStatus.PAGO]});
             default:
                 return this.reembolsoRepository.findAll();
         }
