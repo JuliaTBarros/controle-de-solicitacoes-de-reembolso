@@ -11,7 +11,7 @@ export class ListarReembolsosUseCase {
             case Role.COLABORADOR:
                 return this.reembolsoRepository.findAll({solicitanteId: Number(usuario.sub)});
             case Role.GESTOR:
-                return this.reembolsoRepository.findAll({status: ReembolsoStatus.ENVIADO});
+                return this.reembolsoRepository.findAll({status: [ReembolsoStatus.ENVIADO, ReembolsoStatus.APROVADO, ReembolsoStatus.REJEITADO]});
             case Role.FINANCEIRO:
                 return this.reembolsoRepository.findAll({status: [ReembolsoStatus.APROVADO, ReembolsoStatus.PAGO]});
             default:
