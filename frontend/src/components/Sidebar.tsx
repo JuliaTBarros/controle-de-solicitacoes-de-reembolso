@@ -1,8 +1,10 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, FolderOpen, LogOut } from 'lucide-react';
+import { LayoutDashboard, FolderOpen, LogOut, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { Role } from '../types/user';
 import { cn } from '@/lib/utils';
+import { Switch } from './ui/switch';
 
 const NAV_LINKS = [
   {
@@ -23,6 +25,7 @@ const NAV_LINKS = [
 
 export function Sidebar() {
   const { user, logout } = useAuth();
+  const { theme, toggle } = useTheme();
   if (!user) return null;
 
   const initials = user.name
@@ -68,6 +71,21 @@ export function Sidebar() {
           </NavLink>
         ))}
       </nav>
+
+      <div className="px-3 py-2 border-t flex items-center justify-between">
+        <span className="text-xs text-muted-foreground font-medium">
+          {theme === 'dark' ? 'Modo escuro' : 'Modo claro'}
+        </span>
+        <div className="flex items-center gap-1.5">
+          <Sun className="w-3.5 h-3.5 text-muted-foreground" />
+          <Switch
+            checked={theme === 'dark'}
+            onCheckedChange={toggle}
+            aria-label="Alternar tema"
+          />
+          <Moon className="w-3.5 h-3.5 text-muted-foreground" />
+        </div>
+      </div>
 
       <div className="p-3 border-t space-y-3">
         <div className="flex items-center gap-2.5">
